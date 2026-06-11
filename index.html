@@ -284,289 +284,460 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis Batch Calendar</title>
-    <style>
-        :root {
-            /* Palette */
-            --bg-light-blue: #E8F4FD;
-            --card-white: #FFFFFF;
-            --text-dark: #1A1A1A;
-            --text-muted: #555555;
-            --accent-blue: #0047AB;
-            --border-light: #D1E5F7;
-            --hover-blue: #003380;
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        .day-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+            padding-bottom: 8px;
+            text-transform: uppercase;
         }
 
-        body {
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
             background-color: var(--bg-light-blue);
             color: var(--text-dark);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            padding: 40px 20px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .day-cell.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+
+        .day-cell:not(.empty):hover {
+            transform: translateY(-2px);
+            background-color: var(--accent-blue);
+            color: var(--card-white);
+            box-shadow: 0 4px 12px rgba(0, 71, 171, 0.2);
+        }
+
+        .day-cell.today {
+            border: 2px solid var(--accent-blue);
+            background-color: var(--card-white);
+            color: var(--accent-blue);
+        }
+
+        /* --- Modal Popover --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        /* --- Summarized Top Card --- */
-        .summary-card {
+        .modal-content {
             background-color: var(--card-white);
             border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 24px rgba(0, 71, 171, 0.05);
-            border: 1px solid var(--border-light);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 24px;
-            align-items: center;
-            justify-content: space-between;
+            width: 90%;
+            max-width: 400px;
+            padding: 32px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            position: relative;
         }
 
-        .summary-main {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
         }
 
-        .summary-main h2 {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
             color: var(--text-muted);
-            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s;
         }
 
-        .summary-main .main-batch {
-            font-size: 36px;
+        .close-btn:hover {
+            color: var(--accent-blue);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-date {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .modal-batch {
+            font-size: 48px;
             font-weight: 800;
             color: var(--accent-blue);
             line-height: 1;
         }
 
-        .summary-main .main-date {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .summary-retro {
+        .modal-retro-list {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 12px;
-            flex: 1;
-            justify-content: flex-end;
         }
 
-        .retro-pill {
-            background-color: var(--bg-light-blue);
-            border: 1px solid var(--border-light);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            min-width: 110px;
-        }
-
-        .retro-pill .label {
-            font-weight: 700;
-            color: var(--accent-blue);
-            text-transform: uppercase;
-            font-size: 10px;
-            margin-bottom: 2px;
-        }
-
-        .retro-pill .date {
-            font-weight: 500;
-        }
-
-        /* --- Week Tracker Card --- */
-        .week-card {
-            background-color: var(--card-white);
-            border-radius: 16px;
-            margin-bottom: 32px;
-            box-shadow: 0 8px 24px rgba(0, 71, 171, 0.05);
-            border: 1px solid var(--border-light);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .week-header-nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-            background-color: var(--card-white);
-            position: relative;
-            z-index: 2;
-        }
-
-        .week-info {
-            text-align: center;
-            cursor: pointer;
-            flex: 1;
-            padding: 0 16px;
-            user-select: none;
-        }
-
-        .week-info h3 {
-            font-size: 18px;
-            color: var(--accent-blue);
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        /* Dropdown Arrow */
-        .week-info h3::after {
-            content: '';
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid var(--accent-blue);
-            transition: transform 0.3s ease;
-        }
-
-        .week-card.expanded .week-info h3::after {
-            transform: rotate(180deg);
-        }
-
-        .week-dates {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .week-dropdown {
-            max-height: 0;
-            overflow: hidden;
-            background-color: var(--bg-light-blue);
-            transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
-        }
-
-        .week-card.expanded .week-dropdown {
-            max-height: 800px;
-            transition: max-height 0.4s ease-in-out;
-        }
-
-        .week-days-list {
-            padding: 16px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .week-day-item {
+        .modal-retro-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 16px;
-            background-color: var(--card-white);
+            background-color: var(--bg-light-blue);
             border-radius: 8px;
             border: 1px solid var(--border-light);
         }
 
-        .week-day-item.is-today {
-            border-left: 4px solid var(--accent-blue);
-        }
-
-        .week-day-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .day-letter {
-            font-size: 16px;
-            font-weight: 800;
+        .modal-retro-label {
+            font-weight: 700;
+            font-size: 13px;
             color: var(--accent-blue);
-            width: 20px;
-            text-align: center;
         }
 
-        .day-full-date {
-            font-size: 14px;
+        .modal-retro-value {
+            font-size: 13px;
             font-weight: 500;
             color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .week-batch-badge {
-            background-color: var(--bg-light-blue);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--accent-blue);
-            border: 1px solid var(--border-light);
-        }
-
-        /* --- Calendar Navigation & Grid --- */
-        .calendar-card {
+        .modal-retro-badge {
             background-color: var(--card-white);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 8px 24px rgba(0, 71, 171, 0.05);
-            border: 1px solid var(--border-light);
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--bg-light-blue);
-        }
-
-        .calendar-header h3 {
-            font-size: 20px;
+            padding: 2px 8px;
+            border-radius: 4px;
             font-weight: 700;
-            color: var(--accent-blue);
-        }
-
-        .nav-btn {
-            background: none;
             border: 1px solid var(--border-light);
-            background-color: var(--bg-light-blue);
-            color: var(--accent-blue);
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
         }
 
-        .nav-btn:hover:not(:disabled) {
-            background-color: var(--accent-blue);
-            color: var(--card-white);
+        @media (max-width: 600px) {
+            .summary-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .summary-retro {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="summary-card">
+            <div class="summary-main">
+                <h2>Today's Analysis</h2>
+                <div class="main-batch" id="todayBatch"></div>
+                <div class="main-date" id="todayDate"></div>
+            </div>
+            <div class="summary-retro" id="todayRetrospectives">
+                </div>
+        </div>
+
+        <div class="week-card" id="weekCard">
+            <div class="week-header-nav">
+                <button class="nav-btn" onclick="changeWeek(-1)">&lt;</button>
+                <div class="week-info" onclick="toggleWeek()">
+                    <h3 id="weekTitle">Week Number</h3>
+                    <div class="week-dates" id="weekDateRange">Start Date - End Date</div>
+                </div>
+                <button class="nav-btn" onclick="changeWeek(1)">&gt;</button>
+            </div>
+            <div class="week-dropdown">
+                <div class="week-days-list" id="weekDaysList">
+                    </div>
+            </div>
+        </div>
+
+        <div class="calendar-card">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevBtn" onclick="changeMonth(-1)">&lt;</button>
+                <h3 id="monthYearDisplay">Month Year</h3>
+                <button class="nav-btn" id="nextBtn" onclick="changeMonth(1)">&gt;</button>
+            </div>
+            <div class="days-grid" id="calendarGrid">
+                </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal(event)">&times;</button>
+            <div class="modal-header">
+                <div class="modal-date" id="modalDate"></div>
+                <div class="modal-batch" id="modalBatch"></div>
+            </div>
+            <div class="modal-retro-list" id="modalRetroList">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const batchMap = {
+            1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'H', 9: 'I', 10: 'J',
+            11: 'K', 12: 'L', 13: 'M', 14: 'N', 15: 'O', 16: 'P', 17: 'R', 18: 'S', 19: 'T', 20: 'U',
+            21: 'X', 22: 'Y', 23: 'Z', 24: '2', 25: '3', 26: '4', 27: '5', 28: '6', 29: '7', 30: '8', 31: '9'
+        };
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        let currentDate = new Date();
+        
+        // Month Calendar State
+        let displayMonth = currentDate.getMonth();
+        let displayYear = currentDate.getFullYear();
+        const maxYear = 2050;
+
+        // Week Card State
+        let currentWeekBaseDate = new Date();
+
+        function getOrdinalSuffix(i) {
+            const j = i % 10, k = i % 100;
+            if (j === 1 && k !== 11) return i + "st";
+            if (j === 2 && k !== 12) return i + "nd";
+            if (j === 3 && k !== 13) return i + "rd";
+            return i + "th";
         }
 
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        function formatDate(date) {
+            return `${getOrdinalSuffix(date.getDate())} of ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
         }
+
+        function getShortDate(date) {
+            return `${date.getDate()} ${monthNames[date.getMonth()].substring(0, 3)} ${date.getFullYear()}`;
+        }
+
+        function getPastDate(baseDate, monthsBack) {
+            const d = new Date(baseDate.getTime());
+            const targetMonth = d.getMonth() - monthsBack;
+            const targetDay = d.getDate();
+            
+            d.setDate(1); 
+            d.setMonth(targetMonth);
+            
+            const lastDayOfTargetMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+            d.setDate(Math.min(targetDay, lastDayOfTargetMonth));
+            
+            return d;
+        }
+
+        // --- Summarized Top Card Logic ---
+        function initSummaryCard() {
+            const today = new Date();
+            document.getElementById('todayBatch').textContent = batchMap[today.getDate()];
+            document.getElementById('todayDate').textContent = formatDate(today);
+
+            const retroContainer = document.getElementById('todayRetrospectives');
+            const intervals = [1, 3, 6, 9, 12];
+            
+            intervals.forEach(months => {
+                const pastDate = getPastDate(today, months);
+                const pill = document.createElement('div');
+                pill.className = 'retro-pill';
+                pill.innerHTML = `
+                    <span class="label">${months} Month${months > 1 ? 's' : ''} Ago</span>
+                    <span class="date">${getShortDate(pastDate)} (${batchMap[pastDate.getDate()]})</span>
+                `;
+                retroContainer.appendChild(pill);
+            });
+        }
+
+        // --- Weekly Tracker Logic ---
+        function getStartOfWeek(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day; // Adjusts to Sunday
+            return new Date(d.setDate(diff));
+        }
+
+        function getWeekNumber(date) {
+            const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+            const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+            // Calculating standard week number based on Sunday start
+            return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+        }
+
+        function renderWeekCard() {
+            const startOfWeek = getStartOfWeek(currentWeekBaseDate);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+            const weekNumber = getWeekNumber(startOfWeek);
+
+            document.getElementById('weekTitle').textContent = `Week ${weekNumber}`;
+            document.getElementById('weekDateRange').textContent = `${getShortDate(startOfWeek)} - ${getShortDate(endOfWeek)}`;
+
+            const listContainer = document.getElementById('weekDaysList');
+            listContainer.innerHTML = '';
+
+            const dayLetters = ["S", "M", "T", "W", "T", "F", "S"];
+
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(startOfWeek);
+                dayDate.setDate(startOfWeek.getDate() + i);
+
+                const batch = batchMap[dayDate.getDate()];
+                const isToday = dayDate.toDateString() === new Date().toDateString();
+
+                const item = document.createElement('div');
+                item.className = `week-day-item ${isToday ? 'is-today' : ''}`;
+                
+                item.innerHTML = `
+                    <div class="week-day-left">
+                        <span class="day-letter">${dayLetters[i]}</span>
+                        <span class="day-full-date">${formatDate(dayDate)}</span>
+                    </div>
+                    <span class="week-batch-badge">${batch}</span>
+                `;
+                listContainer.appendChild(item);
+            }
+        }
+
+        function changeWeek(direction) {
+            currentWeekBaseDate.setDate(currentWeekBaseDate.getDate() + (direction * 7));
+            renderWeekCard();
+        }
+
+        function toggleWeek() {
+            document.getElementById('weekCard').classList.toggle('expanded');
+        }
+
+        // --- Monthly Calendar Grid Logic ---
+        function renderCalendar() {
+            document.getElementById('monthYearDisplay').textContent = `${monthNames[displayMonth]} ${displayYear}`;
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = ''; 
+
+            document.getElementById('prevBtn').disabled = false; 
+            document.getElementById('nextBtn').disabled = (displayYear >= maxYear && displayMonth === 11);
+
+            dayNames.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+
+            const firstDay = new Date(displayYear, displayMonth, 1).getDay();
+            const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'day-cell empty';
+                grid.appendChild(empty);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                
+                if (displayYear === currentDate.getFullYear() && 
+                    displayMonth === currentDate.getMonth() && 
+                    day === currentDate.getDate()) {
+                    cell.classList.add('today');
+                }
+
+                cell.textContent = day;
+                cell.onclick = () => openModal(day, displayMonth, displayYear);
+                grid.appendChild(cell);
+            }
+        }
+
+        function changeMonth(direction) {
+            displayMonth += direction;
+            if (displayMonth > 11) {
+                if (displayYear >= maxYear) {
+                    displayMonth = 11;
+                    return;
+                }
+                displayMonth = 0;
+                displayYear++;
+            } else if (displayMonth < 0) {
+                displayMonth = 11;
+                displayYear--;
+            }
+            renderCalendar();
+        }
+
+        // --- Modal Logic ---
+        function openModal(day, month, year) {
+            const selectedDate = new Date(year, month, day);
+            const batch = batchMap[day];
+
+            document.getElementById('modalDate').textContent = formatDate(selectedDate);
+            document.getElementById('modalBatch').textContent = batch;
+
+            const listContainer = document.getElementById('modalRetroList');
+            listContainer.innerHTML = '';
+
+            const intervals = [1, 3, 6, 9, 12];
+            intervals.forEach(months => {
+                const pastDate = getPastDate(selectedDate, months);
+                const pastBatch = batchMap[pastDate.getDate()];
+
+                const item = document.createElement('div');
+                item.className = 'modal-retro-item';
+                item.innerHTML = `
+                    <div class="modal-retro-label">${months} Month${months > 1 ? 's' : ''}</div>
+                    <div class="modal-retro-value">
+                        ${getShortDate(pastDate)}
+                        <span class="modal-retro-badge">${pastBatch}</span>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event.target.id === 'modalOverlay' || event.target.classList.contains('close-btn')) {
+                document.getElementById('modalOverlay').classList.remove('active');
+            }
+        }
+
+        // --- Initialize App ---
+        initSummaryCard();
+        renderWeekCard();
+        renderCalendar();
+
+    </script>
+</body>
+</html>
