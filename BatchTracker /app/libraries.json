@@ -1,0 +1,20 @@
+[
+  {
+    "artifactId": "appcompat",
+    "excludes": [],
+    "groupId": "androidx.appcompat",
+    "versionName": "1.3.1"
+  },
+  {
+    "artifactId": "cardview",
+    "excludes": [],
+    "groupId": "androidx.cardview",
+    "versionName": "1.0.0"
+  },
+  {
+    "artifactId": "fragment",
+    "excludes": [],
+    "groupId": "androidx.fragment",
+    "versionName": "1.3.6"
+  }
+]
