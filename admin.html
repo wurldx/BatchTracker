@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Tracker Admin</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #E8F4FD; font-family: sans-serif; padding: 20px; }
+        .login-card {
+            background: white; border-radius: 16px; padding: 32px;
+            max-width: 400px; margin: 100px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h2 { color: #0047AB; margin-bottom: 24px; text-align: center; }
+        input {
+            width: 100%; padding: 12px; border: 1px solid #D1E5F7;
+            border-radius: 8px; font-size: 16px; margin-bottom: 16px;
+        }
+        button {
+            width: 100%; padding: 12px; background: #0047AB;
+            color: white; border: none; border-radius: 8px;
+            font-size: 16px; cursor: pointer; font-weight: bold;
+        }
+        button:hover { background: #003380; }
+        .admin-panel { display: none; max-width: 600px; margin: 0 auto; }
+        .card {
+            background: white; border-radius: 16px; padding: 24px;
+            margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px; }
+        label { font-size: 12px; font-weight: bold; color: #0047AB; text-transform: uppercase; }
+        select, input[type="text"], input[type="email"], input[type="password"] {
+            padding: 10px; border: 1px solid #D1E5F7;
+            border-radius: 8px; font-size: 14px; width: 100%;
+        }
+        .save-btn {
+            background: #0047AB; color: white; border: none;
+            padding: 10px 24px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; width: auto;
+        }
+        .status { margin-top: 12px; padding: 10px; border-radius: 8px; display: none; }
+        .status.success { background: #E8F5E9; color: #2E7D32; display: block; }
+        .status.error { background: #FFEBEE; color: #C62828; display: block; }
+        .batch-list { margin-top: 16px; }
+        .batch-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; background: #E8F4FD; border-radius: 8px;
+            margin-bottom: 8px; font-size: 14px;
+        }
+        .batch-badge {
+            background: white; color: #0047AB; font-weight: bold;
+            padding: 4px 12px; border-radius: 20px; border: 1px solid #D1E5F7;
+        }
+        .logout-btn {
+            background: none; color: #555; border: 1px solid #ccc;
+            padding: 8px 16px; border-radius: 8px; cursor: pointer;
+            font-size: 13px; width: auto; margin-bottom: 16px;
+        }
+        .user-info {
+            font-size: 13px; color: #555; margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-card" id="loginCard">
+    <h2>Admin Login</h2>
+    <input type="email" id="emailInput" placeholder="Enter your email" />
+    <input type="password" id="passwordInput" placeholder="Enter your password" />
+    <button onclick="login()">Login</button>
+    <div class="status" id="loginStatus"></div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+    <div class="user-info" id="userInfo"></div>
+    <button class="logout-btn" onclick="logout()">← Logout</button>
+
+    <div class="card">
+        <h2 style="margin-bottom:20px;">Set Batch for Date</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Year</label>
+                <select id="yearSelect"></select>
+            </div>
+            <div class="form-group">
+                <label>Month</label>
+                <select id="monthSelect">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Day</label>
+                <select id="daySelect"></select>
+            </div>
+            <div class="form-group">
+                <label>Batch</label>
+                <input type="text" id="batchInput" placeholder="e.g. A" maxlength="2" />
+            </div>
+        </div>
+        <br>
+        <button class="save-btn" onclick="saveBatch()">Save Batch</button>
+        <div class="status" id="saveStatus"></div>
+    </div>
+
+    <div class="card">
+        <h2 style="margin-bottom:16px;">Recent Entries</h2>
+        <div class="batch-list" id="batchList">Loading...</div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAKFfpys1vDb6Wydq6yl5MdEYJk1anzMcw",
+        authDomain: "batchtracker-de89d.firebaseapp.com",
+        databaseURL: "https://batchtracker-de89d-default-rtdb.firebaseio.com",
+        projectId: "batchtracker-de89d",
+        storageBucket: "batchtracker-de89d.firebasestorage.app",
+        messagingSenderId: "854137890053",
+        appId: "1:854137890053:web:164f0bb7f5dca02124c36c"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const db   = getDatabase(app);
+    const auth = getAuth(app);
+
+    // Populate year dropdown
+    const yearSelect = document.getElementById('yearSelect');
+    for (let y = 2024; y <= 2030; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.text = y;
+        if (y === new Date().getFullYear()) opt.selected = true;
+        yearSelect.appendChild(opt);
+    }
+
+    // Populate day dropdown
+    const daySelect = document.getElementById('daySelect');
+    for (let d = 1; d <= 31; d++) {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.text = d;
+        if (d === new Date().getDate()) opt.selected = true;
+        daySelect.appendChild(opt);
+    }
+
+    // Set current month
+    document.getElementById('monthSelect').value = new Date().getMonth() + 1;
+
+    // Watch auth state
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userInfo').textContent = 'Logged in as: ' + user.email;
+            loadRecentBatches();
+        } else {
+            document.getElementById('loginCard').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+    });
+
+    window.login = async function() {
+        const email    = document.getElementById('emailInput').value;
+        const password = document.getElementById('passwordInput').value;
+        const status   = document.getElementById('loginStatus');
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (e) {
+            status.textContent = 'Wrong email or password!';
+            status.className = 'status error';
+        }
+    }
+
+    window.logout = async function() {
+        await signOut(auth);
+    }
+
+    window.saveBatch = async function() {
+        const year   = document.getElementById('yearSelect').value;
+        const month  = document.getElementById('monthSelect').value;
+        const day    = document.getElementById('daySelect').value;
+        const batch  = document.getElementById('batchInput').value.toUpperCase().trim();
+        const status = document.getElementById('saveStatus');
+
+        if (!batch) {
+            status.textContent = 'Please enter a batch letter!';
+            status.className = 'status error';
+            return;
+        }
+
+        try {
+            await set(ref(db, `batches/${year}/${month}/${day}`), batch);
+            status.textContent = `Saved! ${day}/${month}/${year} = ${batch}`;
+            status.className = 'status success';
+            loadRecentBatches();
+        } catch (e) {
+            status.textContent = 'Error saving: ' + e.message;
+            status.className = 'status error';
+        }
+    }
+
+    async function loadRecentBatches() {
+        const listEl = document.getElementById('batchList');
+        try {
+            const snapshot = await get(ref(db, 'batches'));
+            if (!snapshot.exists()) {
+                listEl.innerHTML = '<p style="color:#555">No batches set yet.</p>';
+                return;
+            }
+            const data = snapshot.val();
+            let items = [];
+            for (const year in data) {
+                for (const month in data[year]) {
+                    for (const day in data[year][month]) {
+                        items.push({ year, month, day, batch: data[year][month][day] });
+                    }
+                }
+            }
+            items.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day));
+            items = items.slice(0, 10);
+            listEl.innerHTML = items.map(i =>
+                `<div class="batch-item">
+                    <span>${i.day}/${i.month}/${i.year}</span>
+                    <span class="batch-badge">${i.batch}</span>
+                </div>`
+            ).join('');
+        } catch (e) {
+            listEl.innerHTML = '<p style="color:red">Error loading data</p>';
+        }
+    }
+
+    // Enter key on password
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') window.login();
+    });
+</script>
+
+</body>
+</html>
