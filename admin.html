@@ -1,124 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batch Tracker Admin</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #E8F4FD; font-family: sans-serif; padding: 20px; }
-        .login-card {
-            background: white; border-radius: 16px; padding: 32px;
-            max-width: 400px; margin: 100px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        h2 { color: #0047AB; margin-bottom: 24px; text-align: center; }
-        input {
-            width: 100%; padding: 12px; border: 1px solid #D1E5F7;
-            border-radius: 8px; font-size: 16px; margin-bottom: 16px;
-        }
-        button {
-            width: 100%; padding: 12px; background: #0047AB;
-            color: white; border: none; border-radius: 8px;
-            font-size: 16px; cursor: pointer; font-weight: bold;
-        }
-        button:hover { background: #003380; }
-        .admin-panel { display: none; max-width: 600px; margin: 0 auto; }
-        .card {
-            background: white; border-radius: 16px; padding: 24px;
-            margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-        .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px; }
-        label { font-size: 12px; font-weight: bold; color: #0047AB; text-transform: uppercase; }
-        select, input[type="text"], input[type="email"], input[type="password"] {
-            padding: 10px; border: 1px solid #D1E5F7;
-            border-radius: 8px; font-size: 14px; width: 100%;
-        }
-        .save-btn {
-            background: #0047AB; color: white; border: none;
-            padding: 10px 24px; border-radius: 8px; cursor: pointer;
-            font-weight: bold; width: auto;
-        }
-        .status { margin-top: 12px; padding: 10px; border-radius: 8px; display: none; }
-        .status.success { background: #E8F5E9; color: #2E7D32; display: block; }
-        .status.error { background: #FFEBEE; color: #C62828; display: block; }
-        .batch-list { margin-top: 16px; }
-        .batch-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; background: #E8F4FD; border-radius: 8px;
-            margin-bottom: 8px; font-size: 14px;
-        }
-        .batch-badge {
-            background: white; color: #0047AB; font-weight: bold;
-            padding: 4px 12px; border-radius: 20px; border: 1px solid #D1E5F7;
-        }
-        .logout-btn {
-            background: none; color: #555; border: 1px solid #ccc;
-            padding: 8px 16px; border-radius: 8px; cursor: pointer;
-            font-size: 13px; width: auto; margin-bottom: 16px;
-        }
-        .user-info {
-            font-size: 13px; color: #555; margin-bottom: 16px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batch Tracker — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #101820;
+        --paper: #F7F4EC;
+        --paper-line: #E3DDCC;
+        --stamp: #C75D3D;
+        --stamp-dark: #A8472E;
+        --teal: #2D4F4F;
+        --muted: #756F60;
+        --card: #FFFFFF;
+        --error: #B3402E;
+        --success: #2D4F4F;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        background: var(--paper);
+        background-image:
+            linear-gradient(var(--paper-line) 1px, transparent 1px);
+        background-size: 100% 32px;
+        font-family: 'Inter', sans-serif;
+        color: var(--ink);
+        min-height: 100vh;
+        padding: 24px 16px 60px;
+    }
+
+    .wrap { max-width: 480px; margin: 0 auto; }
+
+    /* ── Masthead ── */
+    .masthead {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+        border-bottom: 3px solid var(--ink);
+    }
+    .masthead h1 {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+    .masthead .tag {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    /* ── Login Card ── */
+    .login-card {
+        background: var(--card);
+        border: 1px solid var(--paper-line);
+        padding: 36px 28px;
+        margin-top: 60px;
+        box-shadow: 0 2px 0 var(--ink);
+    }
+    .login-card .stamp-mark {
+        width: 56px; height: 56px;
+        border: 3px solid var(--stamp);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: 700; font-size: 22px;
+        color: var(--stamp);
+        margin: 0 auto 20px;
+        transform: rotate(-8deg);
+    }
+    .login-card h2 {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        text-align: center;
+        margin-bottom: 24px;
+        color: var(--muted);
+    }
+    .field-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        display: block;
+        margin-bottom: 6px;
+    }
+    input[type="email"], input[type="password"], input[type="text"] {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--ink);
+        background: var(--paper);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        color: var(--ink);
+        margin-bottom: 16px;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus {
+        border-color: var(--stamp);
+        box-shadow: 0 0 0 3px rgba(199, 93, 61, 0.15);
+    }
+    button {
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 13px;
+        cursor: pointer;
+        border: none;
+    }
+    .btn-primary {
+        width: 100%;
+        padding: 13px;
+        background: var(--ink);
+        color: var(--paper);
+        transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--stamp-dark); }
+    .btn-primary:active { transform: translateY(1px); }
+
+    .status {
+        margin-top: 14px;
+        padding: 10px 12px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        display: none;
+        border-left: 3px solid;
+    }
+    .status.error { display: block; background: #FBEAE6; color: var(--error); border-color: var(--error); }
+    .status.success { display: block; background: #E8EFEE; color: var(--success); border-color: var(--success); }
+
+    /* ── Admin Panel ── */
+    .admin-panel { display: none; }
+
+    .session-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed var(--paper-line);
+    }
+    .logout-link {
+        background: none; border: none;
+        color: var(--muted);
+        text-decoration: underline;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        cursor: pointer;
+        padding: 0;
+    }
+    .logout-link:hover { color: var(--stamp); }
+
+    .ledger-card {
+        background: var(--card);
+        border: 1px solid var(--paper-line);
+        margin-bottom: 20px;
+        box-shadow: 0 2px 0 var(--ink);
+    }
+    .ledger-head {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--card);
+        background: var(--ink);
+        padding: 10px 18px;
+    }
+    .ledger-body { padding: 24px 20px; }
+
+    /* Date row — reads left to right like a stamped date */
+    .date-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .date-part { display: flex; flex-direction: column; flex: 1; min-width: 70px; }
+    .date-part select {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 15px;
+        font-weight: 600;
+        padding: 10px 8px;
+        border: 1.5px solid var(--ink);
+        background: var(--paper);
+        color: var(--ink);
+        width: 100%;
+        outline: none;
+    }
+    .date-sep {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 18px;
+        color: var(--paper-line);
+        align-self: flex-end;
+        padding-bottom: 11px;
+    }
+
+    /* Stamp input + live preview, side by side */
+    .stamp-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 16px;
+        background: var(--paper);
+        border: 1px dashed var(--paper-line);
+        margin-bottom: 20px;
+    }
+    .stamp-preview {
+        width: 64px; height: 64px;
+        flex-shrink: 0;
+        border: 3px solid var(--stamp);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: 700;
+        font-size: 26px;
+        color: var(--stamp);
+        transform: rotate(-6deg);
+        transition: transform 0.15s;
+    }
+    .stamp-input-col { flex: 1; }
+    .stamp-input-col input {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 20px;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+        padding: 10px;
+        margin-bottom: 0;
+    }
+
+    .btn-row { display: flex; justify-content: flex-end; }
+    .btn-save {
+        padding: 12px 28px;
+        background: var(--stamp);
+        color: var(--paper);
+        transition: background 0.15s;
+    }
+    .btn-save:hover { background: var(--stamp-dark); }
+
+    /* ── Recent entries ── */
+    .entry-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--paper-line);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 13px;
+    }
+    .entry-row:last-child { border-bottom: none; }
+    .entry-date { color: var(--ink); }
+    .entry-badge {
+        width: 28px; height: 28px;
+        border: 1.5px solid var(--teal);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700;
+        color: var(--teal);
+        font-size: 13px;
+    }
+    .empty-state {
+        padding: 28px 20px;
+        text-align: center;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: var(--muted);
+    }
+</style>
 </head>
 <body>
 
-<!-- Login Screen -->
-<div class="login-card" id="loginCard">
-    <h2>Admin Login</h2>
-    <input type="email" id="emailInput" placeholder="Enter your email" />
-    <input type="password" id="passwordInput" placeholder="Enter your password" />
-    <button onclick="login()">Login</button>
-    <div class="status" id="loginStatus"></div>
-</div>
+<div class="wrap">
 
-<!-- Admin Panel -->
-<div class="admin-panel" id="adminPanel">
-    <div class="user-info" id="userInfo"></div>
-    <button class="logout-btn" onclick="logout()">← Logout</button>
-
-    <div class="card">
-        <h2 style="margin-bottom:20px;">Set Batch for Date</h2>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Year</label>
-                <select id="yearSelect"></select>
-            </div>
-            <div class="form-group">
-                <label>Month</label>
-                <select id="monthSelect">
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Day</label>
-                <select id="daySelect"></select>
-            </div>
-            <div class="form-group">
-                <label>Batch</label>
-                <input type="text" id="batchInput" placeholder="e.g. A" maxlength="2" />
-            </div>
-        </div>
-        <br>
-        <button class="save-btn" onclick="saveBatch()">Save Batch</button>
-        <div class="status" id="saveStatus"></div>
+    <div class="masthead">
+        <h1>Batch Tracker</h1>
+        <span class="tag">Admin</span>
     </div>
 
-    <div class="card">
-        <h2 style="margin-bottom:16px;">Recent Entries</h2>
-        <div class="batch-list" id="batchList">Loading...</div>
+    <!-- Login -->
+    <div class="login-card" id="loginCard">
+        <div class="stamp-mark">BT</div>
+        <h2>Sign in to continue</h2>
+        <label class="field-label" for="emailInput">Email</label>
+        <input type="email" id="emailInput" placeholder="you@example.com" />
+        <label class="field-label" for="passwordInput">Password</label>
+        <input type="password" id="passwordInput" placeholder="••••••••" />
+        <button class="btn-primary" onclick="login()">Sign in</button>
+        <div class="status" id="loginStatus"></div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+
+        <div class="session-bar">
+            <span id="userInfo"></span>
+            <button class="logout-link" onclick="logout()">Sign out</button>
+        </div>
+
+        <div class="ledger-card">
+            <div class="ledger-head">Set batch for a date</div>
+            <div class="ledger-body">
+
+                <div class="date-row">
+                    <div class="date-part">
+                        <label class="field-label">Day</label>
+                        <select id="daySelect"></select>
+                    </div>
+                    <span class="date-sep">/</span>
+                    <div class="date-part">
+                        <label class="field-label">Month</label>
+                        <select id="monthSelect">
+                            <option value="1">Jan</option>
+                            <option value="2">Feb</option>
+                            <option value="3">Mar</option>
+                            <option value="4">Apr</option>
+                            <option value="5">May</option>
+                            <option value="6">Jun</option>
+                            <option value="7">Jul</option>
+                            <option value="8">Aug</option>
+                            <option value="9">Sep</option>
+                            <option value="10">Oct</option>
+                            <option value="11">Nov</option>
+                            <option value="12">Dec</option>
+                        </select>
+                    </div>
+                    <span class="date-sep">/</span>
+                    <div class="date-part">
+                        <label class="field-label">Year</label>
+                        <select id="yearSelect"></select>
+                    </div>
+                </div>
+
+                <div class="stamp-row">
+                    <div class="stamp-preview" id="stampPreview">?</div>
+                    <div class="stamp-input-col">
+                        <label class="field-label">Batch letter</label>
+                        <input type="text" id="batchInput" placeholder="A" maxlength="2" />
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn-save" onclick="saveBatch()">Stamp it</button>
+                </div>
+
+                <div class="status" id="saveStatus"></div>
+            </div>
+        </div>
+
+        <div class="ledger-card">
+            <div class="ledger-head">Recent entries</div>
+            <div id="batchList">
+                <div class="empty-state">Loading…</div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -128,7 +381,7 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyAKFfpys1vDb6Wydq6yl5MdEYJk1anzMcw",
+        apiKey: "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",
         authDomain: "batchtracker-de89d.firebaseapp.com",
         databaseURL: "https://batchtracker-de89d-default-rtdb.firebaseio.com",
         projectId: "batchtracker-de89d",
@@ -141,35 +394,36 @@
     const db   = getDatabase(app);
     const auth = getAuth(app);
 
-    // Populate year dropdown
-    const yearSelect = document.getElementById('yearSelect');
+    const yearSelect  = document.getElementById('yearSelect');
+    const monthSelect = document.getElementById('monthSelect');
+    const daySelect   = document.getElementById('daySelect');
+    const batchInput  = document.getElementById('batchInput');
+    const stampPreview = document.getElementById('stampPreview');
+
     for (let y = 2024; y <= 2030; y++) {
         const opt = document.createElement('option');
-        opt.value = y;
-        opt.text = y;
+        opt.value = y; opt.text = y;
         if (y === new Date().getFullYear()) opt.selected = true;
         yearSelect.appendChild(opt);
     }
-
-    // Populate day dropdown
-    const daySelect = document.getElementById('daySelect');
     for (let d = 1; d <= 31; d++) {
         const opt = document.createElement('option');
-        opt.value = d;
-        opt.text = d;
+        opt.value = d; opt.text = String(d).padStart(2, '0');
         if (d === new Date().getDate()) opt.selected = true;
         daySelect.appendChild(opt);
     }
+    monthSelect.value = new Date().getMonth() + 1;
 
-    // Set current month
-    document.getElementById('monthSelect').value = new Date().getMonth() + 1;
+    batchInput.addEventListener('input', () => {
+        const v = batchInput.value.toUpperCase().trim();
+        stampPreview.textContent = v || '?';
+    });
 
-    // Watch auth state
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('userInfo').textContent = 'Logged in as: ' + user.email;
+            document.getElementById('userInfo').textContent = user.email;
             loadRecentBatches();
         } else {
             document.getElementById('loginCard').style.display = 'block';
@@ -181,39 +435,37 @@
         const email    = document.getElementById('emailInput').value;
         const password = document.getElementById('passwordInput').value;
         const status   = document.getElementById('loginStatus');
-
         try {
             await signInWithEmailAndPassword(auth, email, password);
+            status.className = 'status';
         } catch (e) {
-            status.textContent = 'Wrong email or password!';
+            status.textContent = 'Email or password not recognized.';
             status.className = 'status error';
         }
     }
 
-    window.logout = async function() {
-        await signOut(auth);
-    }
+    window.logout = async function() { await signOut(auth); }
 
     window.saveBatch = async function() {
-        const year   = document.getElementById('yearSelect').value;
-        const month  = document.getElementById('monthSelect').value;
-        const day    = document.getElementById('daySelect').value;
-        const batch  = document.getElementById('batchInput').value.toUpperCase().trim();
+        const year   = yearSelect.value;
+        const month  = monthSelect.value;
+        const day    = daySelect.value;
+        const batch  = batchInput.value.toUpperCase().trim();
         const status = document.getElementById('saveStatus');
 
         if (!batch) {
-            status.textContent = 'Please enter a batch letter!';
+            status.textContent = 'Enter a batch letter before stamping.';
             status.className = 'status error';
             return;
         }
 
         try {
             await set(ref(db, `batches/${year}/${month}/${day}`), batch);
-            status.textContent = `Saved! ${day}/${month}/${year} = ${batch}`;
+            status.textContent = `Stamped ${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year} as ${batch}.`;
             status.className = 'status success';
             loadRecentBatches();
         } catch (e) {
-            status.textContent = 'Error saving: ' + e.message;
+            status.textContent = 'Could not save: ' + e.message;
             status.className = 'status error';
         }
     }
@@ -223,7 +475,7 @@
         try {
             const snapshot = await get(ref(db, 'batches'));
             if (!snapshot.exists()) {
-                listEl.innerHTML = '<p style="color:#555">No batches set yet.</p>';
+                listEl.innerHTML = '<div class="empty-state">No batches stamped yet.</div>';
                 return;
             }
             const data = snapshot.val();
@@ -238,21 +490,20 @@
             items.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day));
             items = items.slice(0, 10);
             listEl.innerHTML = items.map(i =>
-                `<div class="batch-item">
-                    <span>${i.day}/${i.month}/${i.year}</span>
-                    <span class="batch-badge">${i.batch}</span>
+                `<div class="entry-row">
+                    <span class="entry-date">${String(i.day).padStart(2,'0')}/${String(i.month).padStart(2,'0')}/${i.year}</span>
+                    <span class="entry-badge">${i.batch}</span>
                 </div>`
             ).join('');
         } catch (e) {
-            listEl.innerHTML = '<p style="color:red">Error loading data</p>';
+            listEl.innerHTML = '<div class="empty-state">Could not load entries.</div>';
         }
     }
 
-    // Enter key on password
     document.getElementById('passwordInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') window.login();
     });
 </script>
 
 </body>
-</html>
+            </html>
