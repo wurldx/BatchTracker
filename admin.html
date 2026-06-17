@@ -19,270 +19,165 @@
         --error: #B3402E;
         --success: #2D4F4F;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
         background: var(--paper);
-        background-image:
-            linear-gradient(var(--paper-line) 1px, transparent 1px);
+        background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
         background-size: 100% 32px;
         font-family: 'Inter', sans-serif;
         color: var(--ink);
         min-height: 100vh;
         padding: 24px 16px 60px;
     }
-
     .wrap { max-width: 480px; margin: 0 auto; }
-
-    /* ── Masthead ── */
     .masthead {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        padding-bottom: 16px;
-        margin-bottom: 24px;
+        display: flex; align-items: baseline; justify-content: space-between;
+        padding-bottom: 16px; margin-bottom: 24px;
         border-bottom: 3px solid var(--ink);
     }
     .masthead h1 {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 18px;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        text-transform: uppercase;
+        font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700;
+        letter-spacing: 0.02em; text-transform: uppercase;
     }
     .masthead .tag {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
+        font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted);
+        text-transform: uppercase; letter-spacing: 0.08em;
     }
-
-    /* ── Login Card ── */
     .login-card {
-        background: var(--card);
-        border: 1px solid var(--paper-line);
-        padding: 36px 28px;
-        margin-top: 60px;
-        box-shadow: 0 2px 0 var(--ink);
+        background: var(--card); border: 1px solid var(--paper-line);
+        padding: 36px 28px; margin-top: 60px; box-shadow: 0 2px 0 var(--ink);
     }
     .login-card .stamp-mark {
-        width: 56px; height: 56px;
-        border: 3px solid var(--stamp);
-        border-radius: 50%;
+        width: 56px; height: 56px; border: 3px solid var(--stamp); border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        font-family: 'IBM Plex Mono', monospace;
-        font-weight: 700; font-size: 22px;
-        color: var(--stamp);
-        margin: 0 auto 20px;
-        transform: rotate(-8deg);
+        font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 22px;
+        color: var(--stamp); margin: 0 auto 20px; transform: rotate(-8deg);
     }
     .login-card h2 {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        text-align: center;
-        margin-bottom: 24px;
-        color: var(--muted);
+        font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-transform: uppercase;
+        letter-spacing: 0.08em; text-align: center; margin-bottom: 24px; color: var(--muted);
     }
     .field-label {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--muted);
-        display: block;
-        margin-bottom: 6px;
+        font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--muted); display: block; margin-bottom: 6px;
     }
     input[type="email"], input[type="password"], input[type="text"] {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1.5px solid var(--ink);
-        background: var(--paper);
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        color: var(--ink);
-        margin-bottom: 16px;
-        outline: none;
+        width: 100%; padding: 12px 14px; border: 1.5px solid var(--ink);
+        background: var(--paper); font-family: 'Inter', sans-serif; font-size: 15px;
+        color: var(--ink); margin-bottom: 16px; outline: none;
         transition: border-color 0.15s, box-shadow 0.15s;
     }
-    input:focus {
-        border-color: var(--stamp);
-        box-shadow: 0 0 0 3px rgba(199, 93, 61, 0.15);
-    }
+    input:focus { border-color: var(--stamp); box-shadow: 0 0 0 3px rgba(199, 93, 61, 0.15); }
     button {
-        font-family: 'IBM Plex Mono', monospace;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-size: 13px;
-        cursor: pointer;
-        border: none;
+        font-family: 'IBM Plex Mono', monospace; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.05em; font-size: 13px; cursor: pointer; border: none;
     }
     .btn-primary {
-        width: 100%;
-        padding: 13px;
-        background: var(--ink);
-        color: var(--paper);
+        width: 100%; padding: 13px; background: var(--ink); color: var(--paper);
         transition: background 0.15s;
     }
     .btn-primary:hover { background: var(--stamp-dark); }
     .btn-primary:active { transform: translateY(1px); }
-
     .status {
-        margin-top: 14px;
-        padding: 10px 12px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        display: none;
-        border-left: 3px solid;
+        margin-top: 14px; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px; display: none; border-left: 3px solid;
     }
     .status.error { display: block; background: #FBEAE6; color: var(--error); border-color: var(--error); }
     .status.success { display: block; background: #E8EFEE; color: var(--success); border-color: var(--success); }
-
-    /* ── Admin Panel ── */
     .admin-panel { display: none; }
-
     .session-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px;
-        color: var(--muted);
-        margin-bottom: 24px;
-        padding-bottom: 12px;
-        border-bottom: 1px dashed var(--paper-line);
+        display: flex; justify-content: space-between; align-items: center;
+        font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted);
+        margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px dashed var(--paper-line);
     }
     .logout-link {
-        background: none; border: none;
-        color: var(--muted);
-        text-decoration: underline;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px;
-        text-transform: uppercase;
-        cursor: pointer;
-        padding: 0;
+        background: none; border: none; color: var(--muted); text-decoration: underline;
+        font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase;
+        cursor: pointer; padding: 0;
     }
     .logout-link:hover { color: var(--stamp); }
-
     .ledger-card {
-        background: var(--card);
-        border: 1px solid var(--paper-line);
-        margin-bottom: 20px;
-        box-shadow: 0 2px 0 var(--ink);
+        background: var(--card); border: 1px solid var(--paper-line);
+        margin-bottom: 20px; box-shadow: 0 2px 0 var(--ink);
     }
     .ledger-head {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--card);
-        background: var(--ink);
-        padding: 10px 18px;
+        font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--card); background: var(--ink); padding: 10px 18px;
+        display: flex; justify-content: space-between; align-items: center;
     }
     .ledger-body { padding: 24px 20px; }
-
-    /* Date row — reads left to right like a stamped date */
-    .date-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
+    .date-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
     .date-part { display: flex; flex-direction: column; flex: 1; min-width: 70px; }
     .date-part select {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 15px;
-        font-weight: 600;
-        padding: 10px 8px;
-        border: 1.5px solid var(--ink);
-        background: var(--paper);
-        color: var(--ink);
-        width: 100%;
-        outline: none;
+        font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600;
+        padding: 10px 8px; border: 1.5px solid var(--ink); background: var(--paper);
+        color: var(--ink); width: 100%; outline: none;
     }
     .date-sep {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 18px;
-        color: var(--paper-line);
-        align-self: flex-end;
-        padding-bottom: 11px;
+        font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--paper-line);
+        align-self: flex-end; padding-bottom: 11px;
     }
-
-    /* Stamp input + live preview, side by side */
+    .day-letter-hint {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 14px; background: var(--paper);
+        border: 1px dashed var(--paper-line); margin-bottom: 20px;
+        font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+    }
+    .day-letter-badge {
+        width: 30px; height: 30px; border: 2px solid var(--teal); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; color: var(--teal); font-size: 14px; flex-shrink: 0;
+    }
     .stamp-row {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        padding: 16px;
-        background: var(--paper);
-        border: 1px dashed var(--paper-line);
-        margin-bottom: 20px;
+        display: flex; align-items: center; gap: 18px; padding: 16px;
+        background: var(--paper); border: 1px dashed var(--paper-line); margin-bottom: 8px;
     }
     .stamp-preview {
-        width: 64px; height: 64px;
-        flex-shrink: 0;
-        border: 3px solid var(--stamp);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-family: 'IBM Plex Mono', monospace;
-        font-weight: 700;
-        font-size: 26px;
-        color: var(--stamp);
-        transform: rotate(-6deg);
-        transition: transform 0.15s;
+        width: 64px; height: 64px; flex-shrink: 0; border: 3px solid var(--stamp);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 22px;
+        color: var(--stamp); transform: rotate(-6deg); transition: all 0.15s;
     }
+    .stamp-preview.invalid { border-color: var(--error); color: var(--error); }
     .stamp-input-col { flex: 1; }
     .stamp-input-col input {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 20px;
-        font-weight: 700;
-        text-align: center;
-        text-transform: uppercase;
-        padding: 10px;
-        margin-bottom: 0;
+        font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700;
+        text-align: center; text-transform: uppercase; padding: 10px; margin-bottom: 0;
     }
-
-    .btn-row { display: flex; justify-content: flex-end; }
-    .btn-save {
-        padding: 12px 28px;
-        background: var(--stamp);
-        color: var(--paper);
-        transition: background 0.15s;
-    }
+    .btn-row { display: flex; justify-content: flex-end; margin-top: 14px; }
+    .btn-save { padding: 12px 28px; background: var(--stamp); color: var(--paper); transition: background 0.15s; }
     .btn-save:hover { background: var(--stamp-dark); }
-
-    /* ── Recent entries ── */
+    .btn-save:disabled { background: var(--paper-line); color: var(--muted); cursor: not-allowed; }
+    .code-chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+    .code-chip {
+        display: flex; align-items: center; gap: 8px;
+        background: var(--paper); border: 1.5px solid var(--ink);
+        padding: 6px 6px 6px 14px; border-radius: 20px;
+        font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px;
+    }
+    .code-chip button {
+        background: var(--ink); color: var(--paper);
+        width: 20px; height: 20px; border-radius: 50%;
+        font-size: 13px; line-height: 1; display: flex; align-items: center; justify-content: center;
+        padding: 0;
+    }
+    .code-chip button:hover { background: var(--error); }
+    .no-codes { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); }
     .entry-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 20px;
-        border-bottom: 1px solid var(--paper-line);
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 13px;
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 12px 20px; border-bottom: 1px solid var(--paper-line);
+        font-family: 'IBM Plex Mono', monospace; font-size: 13px;
     }
     .entry-row:last-child { border-bottom: none; }
     .entry-date { color: var(--ink); }
+    .entry-codes { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
     .entry-badge {
-        width: 28px; height: 28px;
-        border: 1.5px solid var(--teal);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 700;
-        color: var(--teal);
-        font-size: 13px;
+        padding: 3px 9px; border: 1.5px solid var(--teal); border-radius: 12px;
+        font-weight: 700; color: var(--teal); font-size: 12px;
     }
     .empty-state {
-        padding: 28px 20px;
-        text-align: center;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        color: var(--muted);
+        padding: 28px 20px; text-align: center;
+        font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
     }
 </style>
 </head>
@@ -295,7 +190,6 @@
         <span class="tag">Admin</span>
     </div>
 
-    <!-- Login -->
     <div class="login-card" id="loginCard">
         <div class="stamp-mark">BT</div>
         <h2>Sign in to continue</h2>
@@ -307,7 +201,6 @@
         <div class="status" id="loginStatus"></div>
     </div>
 
-    <!-- Admin Panel -->
     <div class="admin-panel" id="adminPanel">
 
         <div class="session-bar">
@@ -316,7 +209,7 @@
         </div>
 
         <div class="ledger-card">
-            <div class="ledger-head">Set batch for a date</div>
+            <div class="ledger-head">Add a production code</div>
             <div class="ledger-body">
 
                 <div class="date-row">
@@ -328,18 +221,12 @@
                     <div class="date-part">
                         <label class="field-label">Month</label>
                         <select id="monthSelect">
-                            <option value="1">Jan</option>
-                            <option value="2">Feb</option>
-                            <option value="3">Mar</option>
-                            <option value="4">Apr</option>
-                            <option value="5">May</option>
-                            <option value="6">Jun</option>
-                            <option value="7">Jul</option>
-                            <option value="8">Aug</option>
-                            <option value="9">Sep</option>
-                            <option value="10">Oct</option>
-                            <option value="11">Nov</option>
-                            <option value="12">Dec</option>
+                            <option value="1">Jan</option><option value="2">Feb</option>
+                            <option value="3">Mar</option><option value="4">Apr</option>
+                            <option value="5">May</option><option value="6">Jun</option>
+                            <option value="7">Jul</option><option value="8">Aug</option>
+                            <option value="9">Sep</option><option value="10">Oct</option>
+                            <option value="11">Nov</option><option value="12">Dec</option>
                         </select>
                     </div>
                     <span class="date-sep">/</span>
@@ -349,19 +236,33 @@
                     </div>
                 </div>
 
+                <div class="day-letter-hint">
+                    <span class="day-letter-badge" id="dayLetterBadge">?</span>
+                    <span id="dayLetterText">This day's letter is —. Codes must start with it.</span>
+                </div>
+
                 <div class="stamp-row">
                     <div class="stamp-preview" id="stampPreview">?</div>
                     <div class="stamp-input-col">
-                        <label class="field-label">Batch letter</label>
-                        <input type="text" id="batchInput" placeholder="A" maxlength="2" />
+                        <label class="field-label">Production code</label>
+                        <input type="text" id="batchInput" placeholder="e.g. RC" maxlength="6" />
                     </div>
                 </div>
 
-                <div class="btn-row">
-                    <button class="btn-save" onclick="saveBatch()">Stamp it</button>
-                </div>
-
                 <div class="status" id="saveStatus"></div>
+
+                <div class="btn-row">
+                    <button class="btn-save" id="addBtn" onclick="addCode()">Add code</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ledger-card">
+            <div class="ledger-head">Codes for this date</div>
+            <div class="ledger-body" style="padding-bottom: 20px;">
+                <div class="code-chip-list" id="currentCodes">
+                    <span class="no-codes">No codes yet for this date.</span>
+                </div>
             </div>
         </div>
 
@@ -373,9 +274,8 @@
         </div>
 
     </div>
-</div>
-
-<script type="module">
+    </div>
+    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
@@ -389,15 +289,26 @@
   messagingSenderId: "854137890053",
   appId: "1:854137890053:web:164f0bb7f5dca02124c36c"
 };
+
     const app  = initializeApp(firebaseConfig);
     const db   = getDatabase(app);
     const auth = getAuth(app);
 
-    const yearSelect  = document.getElementById('yearSelect');
-    const monthSelect = document.getElementById('monthSelect');
-    const daySelect   = document.getElementById('daySelect');
-    const batchInput  = document.getElementById('batchInput');
-    const stampPreview = document.getElementById('stampPreview');
+    const BATCH_MAP = {
+        1:'A',2:'B',3:'C',4:'D',5:'E',6:'F',7:'G',8:'H',9:'I',10:'J',
+        11:'K',12:'L',13:'M',14:'N',15:'O',16:'P',17:'R',18:'S',19:'T',20:'U',
+        21:'X',22:'Y',23:'Z',24:'2',25:'3',26:'4',27:'5',28:'6',29:'7',30:'8',31:'9'
+    };
+
+    const yearSelect    = document.getElementById('yearSelect');
+    const monthSelect   = document.getElementById('monthSelect');
+    const daySelect     = document.getElementById('daySelect');
+    const batchInput    = document.getElementById('batchInput');
+    const stampPreview  = document.getElementById('stampPreview');
+    const dayLetterBadge = document.getElementById('dayLetterBadge');
+    const dayLetterText  = document.getElementById('dayLetterText');
+    const addBtn         = document.getElementById('addBtn');
+    const saveStatus     = document.getElementById('saveStatus');
 
     for (let y = 2024; y <= 2030; y++) {
         const opt = document.createElement('option');
@@ -413,16 +324,53 @@
     }
     monthSelect.value = new Date().getMonth() + 1;
 
-    batchInput.addEventListener('input', () => {
+    function expectedLetter() {
+        return BATCH_MAP[parseInt(daySelect.value)] || '?';
+    }
+
+    function refreshDayLetterHint() {
+        const letter = expectedLetter();
+        dayLetterBadge.textContent = letter;
+        dayLetterText.textContent = `This day's letter is ${letter}. Codes must start with ${letter}.`;
+        validateInput();
+        loadCodesForSelectedDate();
+    }
+
+    function validateInput() {
         const v = batchInput.value.toUpperCase().trim();
         stampPreview.textContent = v || '?';
-    });
+        const letter = expectedLetter();
+
+        if (!v) {
+            stampPreview.classList.remove('invalid');
+            saveStatus.className = 'status';
+            addBtn.disabled = false;
+            return;
+        }
+
+        if (v[0] !== letter) {
+            stampPreview.classList.add('invalid');
+            saveStatus.textContent = `"${v}" doesn't match — the ${String(daySelect.value).padStart(2,'0')} should start with ${letter}.`;
+            saveStatus.className = 'status error';
+            addBtn.disabled = true;
+        } else {
+            stampPreview.classList.remove('invalid');
+            saveStatus.className = 'status';
+            addBtn.disabled = false;
+        }
+    }
+
+    daySelect.addEventListener('change', refreshDayLetterHint);
+    monthSelect.addEventListener('change', loadCodesForSelectedDate);
+    yearSelect.addEventListener('change', loadCodesForSelectedDate);
+    batchInput.addEventListener('input', validateInput);
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('userInfo').textContent = user.email;
+            refreshDayLetterHint();
             loadRecentBatches();
         } else {
             document.getElementById('loginCard').style.display = 'block';
@@ -445,27 +393,81 @@
 
     window.logout = async function() { await signOut(auth); }
 
-    window.saveBatch = async function() {
-        const year   = yearSelect.value;
-        const month  = monthSelect.value;
-        const day    = daySelect.value;
-        const batch  = batchInput.value.toUpperCase().trim();
-        const status = document.getElementById('saveStatus');
+    function currentPath() {
+        return `batches/${yearSelect.value}/${monthSelect.value}/${daySelect.value}`;
+    }
 
-        if (!batch) {
-            status.textContent = 'Enter a batch letter before stamping.';
-            status.className = 'status error';
+    async function loadCodesForSelectedDate() {
+        const listEl = document.getElementById('currentCodes');
+        try {
+            const snapshot = await get(ref(db, currentPath()));
+            const codes = snapshot.exists() ? snapshot.val() : [];
+            renderChips(codes);
+        } catch (e) {
+            listEl.innerHTML = '<span class="no-codes">Could not load.</span>';
+        }
+    }
+
+    function renderChips(codes) {
+        const listEl = document.getElementById('currentCodes');
+        if (!codes || codes.length === 0) {
+            listEl.innerHTML = '<span class="no-codes">No codes yet for this date.</span>';
+            return;
+        }
+        listEl.innerHTML = codes.map((code, idx) =>
+            `<span class="code-chip">${code}<button onclick="deleteCode(${idx})">✕</button></span>`
+        ).join('');
+    }
+
+    window.addCode = async function() {
+        const code = batchInput.value.toUpperCase().trim();
+        const letter = expectedLetter();
+
+        if (!code) {
+            saveStatus.textContent = 'Enter a production code first.';
+            saveStatus.className = 'status error';
+            return;
+        }
+        if (code[0] !== letter) {
+            saveStatus.textContent = `"${code}" doesn't match — this date should start with ${letter}.`;
+            saveStatus.className = 'status error';
             return;
         }
 
         try {
-            await set(ref(db, `batches/${year}/${month}/${day}`), batch);
-            status.textContent = `Stamped ${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year} as ${batch}.`;
-            status.className = 'status success';
+            const snapshot = await get(ref(db, currentPath()));
+            const codes = snapshot.exists() ? snapshot.val() : [];
+            if (codes.includes(code)) {
+                saveStatus.textContent = `"${code}" is already logged for this date.`;
+                saveStatus.className = 'status error';
+                return;
+            }
+            codes.push(code);
+            await set(ref(db, currentPath()), codes);
+            saveStatus.textContent = `Added ${code}.`;
+            saveStatus.className = 'status success';
+            batchInput.value = '';
+            stampPreview.textContent = '?';
+            stampPreview.classList.remove('invalid');
+            renderChips(codes);
             loadRecentBatches();
         } catch (e) {
-            status.textContent = 'Could not save: ' + e.message;
-            status.className = 'status error';
+            saveStatus.textContent = 'Could not save: ' + e.message;
+            saveStatus.className = 'status error';
+        }
+    }
+
+    window.deleteCode = async function(idx) {
+        try {
+            const snapshot = await get(ref(db, currentPath()));
+            let codes = snapshot.exists() ? snapshot.val() : [];
+            codes.splice(idx, 1);
+            await set(ref(db, currentPath()), codes);
+            renderChips(codes);
+            loadRecentBatches();
+        } catch (e) {
+            saveStatus.textContent = 'Could not delete: ' + e.message;
+            saveStatus.className = 'status error';
         }
     }
 
@@ -474,7 +476,7 @@
         try {
             const snapshot = await get(ref(db, 'batches'));
             if (!snapshot.exists()) {
-                listEl.innerHTML = '<div class="empty-state">No batches stamped yet.</div>';
+                listEl.innerHTML = '<div class="empty-state">No codes logged yet.</div>';
                 return;
             }
             const data = snapshot.val();
@@ -482,7 +484,8 @@
             for (const year in data) {
                 for (const month in data[year]) {
                     for (const day in data[year][month]) {
-                        items.push({ year, month, day, batch: data[year][month][day] });
+                        const codes = data[year][month][day];
+                        if (codes && codes.length) items.push({ year, month, day, codes });
                     }
                 }
             }
@@ -491,7 +494,7 @@
             listEl.innerHTML = items.map(i =>
                 `<div class="entry-row">
                     <span class="entry-date">${String(i.day).padStart(2,'0')}/${String(i.month).padStart(2,'0')}/${i.year}</span>
-                    <span class="entry-badge">${i.batch}</span>
+                    <span class="entry-codes">${i.codes.map(c => `<span class="entry-badge">${c}</span>`).join('')}</span>
                 </div>`
             ).join('');
         } catch (e) {
@@ -505,4 +508,4 @@
 </script>
 
 </body>
-            </html>
+</html>
