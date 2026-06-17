@@ -281,14 +281,14 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyAKFfpys1vDb6Wydq6yl5MdEYJk1anzMcw",
-  authDomain: "batchtracker-de89d.firebaseapp.com",
-  databaseURL: "https://batchtracker-de89d-default-rtdb.firebaseio.com",
-  projectId: "batchtracker-de89d",
-  storageBucket: "batchtracker-de89d.firebasestorage.app",
-  messagingSenderId: "854137890053",
-  appId: "1:854137890053:web:164f0bb7f5dca02124c36c"
-};
+        apiKey: "AIzaSyAKFfpys1vDb6Wydq6yl5MdEYJk1anzMcw",
+        authDomain: "batchtracker-de89d.firebaseapp.com",
+        databaseURL: "https://batchtracker-de89d-default-rtdb.firebaseio.com",
+        projectId: "batchtracker-de89d",
+        storageBucket: "batchtracker-de89d.firebasestorage.app",
+        messagingSenderId: "854137890053",
+        appId: "1:854137890053:web:164f0bb7f5dca02124c36c"
+    };
 
     const app  = initializeApp(firebaseConfig);
     const db   = getDatabase(app);
@@ -401,7 +401,8 @@
         const listEl = document.getElementById('currentCodes');
         try {
             const snapshot = await get(ref(db, currentPath()));
-            const codes = snapshot.exists() ? snapshot.val() : [];
+            const rawData = snapshot.exists() ? snapshot.val() : [];
+            const codes = Array.isArray(rawData) ? rawData : Object.values(rawData);
             renderChips(codes);
         } catch (e) {
             listEl.innerHTML = '<span class="no-codes">Could not load.</span>';
@@ -436,7 +437,9 @@
 
         try {
             const snapshot = await get(ref(db, currentPath()));
-            const codes = snapshot.exists() ? snapshot.val() : [];
+            const rawData = snapshot.exists() ? snapshot.val() : [];
+            const codes = Array.isArray(rawData) ? rawData : Object.values(rawData);
+            
             if (codes.includes(code)) {
                 saveStatus.textContent = `"${code}" is already logged for this date.`;
                 saveStatus.className = 'status error';
@@ -460,7 +463,9 @@
     window.deleteCode = async function(idx) {
         try {
             const snapshot = await get(ref(db, currentPath()));
-            let codes = snapshot.exists() ? snapshot.val() : [];
+            const rawData = snapshot.exists() ? snapshot.val() : [];
+            let codes = Array.isArray(rawData) ? rawData : Object.values(rawData);
+            
             codes.splice(idx, 1);
             await set(ref(db, currentPath()), codes);
             renderChips(codes);
@@ -484,8 +489,11 @@
             for (const year in data) {
                 for (const month in data[year]) {
                     for (const day in data[year][month]) {
-                        const codes = data[year][month][day];
-                        if (codes && codes.length) items.push({ year, month, day, codes });
+                        let rawCodes = data[year][month][day];
+                        if (rawCodes) {
+                            const codes = Array.isArray(rawCodes) ? rawCodes : Object.values(rawCodes);
+                            if (codes.length) items.push({ year, month, day, codes });
+                        }
                     }
                 }
             }
@@ -508,4 +516,4 @@
 </script>
 
 </body>
-</html>
+                        </html>
