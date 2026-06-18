@@ -110,6 +110,30 @@
             font-weight: 500;
         }
 
+        /* --- Live Code Chips (from admin) --- */
+        .code-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .code-chip {
+            background-color: var(--accent-blue);
+            color: var(--card-white);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.02em;
+        }
+
+        .code-chip.muted {
+            background-color: var(--bg-light-blue);
+            color: var(--text-muted);
+            border: 1px solid var(--border-light);
+        }
+
         /* --- Week Tracker Card --- */
         .week-card {
             background-color: var(--card-white);
@@ -314,6 +338,20 @@
             color: var(--text-dark);
             transition: all 0.2s ease;
             user-select: none;
+            position: relative;
+        }
+
+        .day-cell .code-dot {
+            position: absolute;
+            bottom: 6px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent-blue);
+        }
+
+        .day-cell:not(.empty):hover .code-dot {
+            background-color: var(--card-white);
         }
 
         .day-cell.empty {
@@ -465,6 +503,7 @@
                 <h2>Today's Analysis</h2>
                 <div class="main-batch" id="todayBatch"></div>
                 <div class="main-date" id="todayDate"></div>
+                <div class="code-chips" id="todayCodeChips"></div>
             </div>
             <div class="summary-retro" id="todayRetrospectives">
                 </div>
@@ -502,13 +541,62 @@
             <div class="modal-header">
                 <div class="modal-date" id="modalDate"></div>
                 <div class="modal-batch" id="modalBatch"></div>
+                <div class="code-chips" id="modalCodeChips" style="justify-content: center; margin-top: 8px;"></div>
             </div>
             <div class="modal-retro-list" id="modalRetroList">
                 </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKFfpys1vDb6Wydq6yl5MdEYJk1anzMcw",
+            authDomain: "batchtracker-de89d.firebaseapp.com",
+            databaseURL: "https://batchtracker-de89d-default-rtdb.firebaseio.com",
+            projectId: "batchtracker-de89d",
+            storageBucket: "batchtracker-de89d.firebasestorage.app",
+            messagingSenderId: "854137890053",
+            appId: "1:854137890053:web:164f0bb7f5dca02124c36c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Cache of all codes loaded from Firebase: codesCache[year][month][day] = [codes...]
+        let codesCache = {};
+
+        async function loadAllCodes() {
+            try {
+                const snapshot = await get(ref(db, 'batches'));
+                codesCache = snapshot.exists() ? snapshot.val() : {};
+            } catch (e) {
+                console.error('Could not load codes from Firebase:', e);
+                codesCache = {};
+            }
+        }
+
+        function getCodesForDate(date) {
+            const y = date.getFullYear();
+            const m = date.getMonth() + 1;
+            const d = date.getDate();
+            const raw = codesCache?.[y]?.[m]?.[d];
+            if (!raw) return [];
+            return Array.isArray(raw) ? raw.filter(Boolean) : Object.values(raw).filter(Boolean);
+        }
+
+        function renderChipsInto(containerId, codes) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            if (!codes || codes.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+            el.innerHTML = codes.map(c => `<span class="code-chip">${c}</span>`).join('');
+        }
+
         const batchMap = {
             1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'H', 9: 'I', 10: 'J',
             11: 'K', 12: 'L', 13: 'M', 14: 'N', 15: 'O', 16: 'P', 17: 'R', 18: 'S', 19: 'T', 20: 'U',
@@ -563,6 +651,7 @@
             const today = new Date();
             document.getElementById('todayBatch').textContent = batchMap[today.getDate()];
             document.getElementById('todayDate').textContent = formatDate(today);
+            renderChipsInto('todayCodeChips', getCodesForDate(today));
 
             const retroContainer = document.getElementById('todayRetrospectives');
             const intervals = [1, 3, 6, 9, 12];
@@ -615,6 +704,7 @@
 
                 const batch = batchMap[dayDate.getDate()];
                 const isToday = dayDate.toDateString() === new Date().toDateString();
+                const dayCodes = getCodesForDate(dayDate);
 
                 const item = document.createElement('div');
                 item.className = `week-day-item ${isToday ? 'is-today' : ''}`;
@@ -622,7 +712,10 @@
                 item.innerHTML = `
                     <div class="week-day-left">
                         <span class="day-letter">${dayLetters[i]}</span>
-                        <span class="day-full-date">${formatDate(dayDate)}</span>
+                        <div>
+                            <span class="day-full-date">${formatDate(dayDate)}</span>
+                            <div class="code-chips">${dayCodes.map(c => `<span class="code-chip">${c}</span>`).join('')}</div>
+                        </div>
                     </div>
                     <span class="week-batch-badge">${batch}</span>
                 `;
@@ -675,6 +768,14 @@
                 }
 
                 cell.textContent = day;
+
+                const cellDate = new Date(displayYear, displayMonth, day);
+                if (getCodesForDate(cellDate).length > 0) {
+                    const dot = document.createElement('span');
+                    dot.className = 'code-dot';
+                    cell.appendChild(dot);
+                }
+
                 cell.onclick = () => openModal(day, displayMonth, displayYear);
                 grid.appendChild(cell);
             }
@@ -703,6 +804,7 @@
 
             document.getElementById('modalDate').textContent = formatDate(selectedDate);
             document.getElementById('modalBatch').textContent = batch;
+            renderChipsInto('modalCodeChips', getCodesForDate(selectedDate));
 
             const listContainer = document.getElementById('modalRetroList');
             listContainer.innerHTML = '';
@@ -734,9 +836,21 @@
         }
 
         // --- Initialize App ---
-        initSummaryCard();
-        renderWeekCard();
-        renderCalendar();
+        // Functions are referenced by inline onclick attributes in the HTML;
+        // since this script is a module, attach them to window explicitly.
+        window.changeWeek = changeWeek;
+        window.toggleWeek = toggleWeek;
+        window.changeMonth = changeMonth;
+        window.closeModal = closeModal;
+
+        async function init() {
+            await loadAllCodes();
+            initSummaryCard();
+            renderWeekCard();
+            renderCalendar();
+        }
+
+        init();
 
     </script>
 </body>
